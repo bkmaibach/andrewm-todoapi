@@ -1,0 +1,22 @@
+{
+  "name": "andrewm-notesapi",
+  "version": "1.0.0",
+  "description": "Lets make a todo app with Andrew Mead on Udemy",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bkmaibach/andrewm-todoapi.git"
+  },
+  "author": "bkmaibach",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bkmaibach/andrewm-todoapi/issues"
+  },
+  "homepage": "https://github.com/bkmaibach/andrewm-todoapi#readme",
+  "dependencies": {
+    "mongodb": "^3.0.10"
+  }
+}
