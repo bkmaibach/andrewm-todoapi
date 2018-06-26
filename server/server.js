@@ -1,11 +1,12 @@
-var {mongoose} = require('./db/mongoose');
-var {Todo} = require('./models/todo');
-var {User} = require('./models/user')
+const {mongoose} = require('./db/mongoose');
+const {Todo} = require('./models/todo');
+const {User} = require('./models/user');
 
-var express = require('express');
-var bodyParser = require('body-parser');
+const express = require('express');
+const bodyParser = require('body-parser');
+const {ObjectID} = require('mongodb');
 
-var app = express();
+const app = express();
 
 //define 'middleware' that can be 'used by express'
 app.use(bodyParser.json());
@@ -34,6 +35,31 @@ app.get('/todos', (req, res) => {
         console.log('cannot retrieve docs');
         res.status(400).send(err);
     })
+    
+});
+
+app.get('/todos/:id', (req, res) => {
+    let id = req.params.id
+
+    if(!ObjectID.isValid(id)){
+        return res.status(400).send({
+            error: 'ID parameter invalid',
+        });
+    }
+
+    Todo.findById(id).then((todo) => {
+        if (todo.length === 0){
+            res.status(404).send({});
+        }
+
+        res.status(200).send({
+            todo: todo,
+            customCode: 'Look ma!'
+        });
+        
+    }).catch((e) => {
+        res.status(400).send();
+    });
     
 });
 
