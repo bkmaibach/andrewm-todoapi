@@ -1,10 +1,10 @@
-const {mongoose} = require('./db/mongoose');
-const {Todo} = require('./models/todo');
-const {User} = require('./models/user');
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
+
+const {mongoose} = require('./db/mongoose');
+const {Todo} = require('./models/todo');
+const {User} = require('./models/user');
 
 const app = express();
 
@@ -42,13 +42,13 @@ app.get('/todos/:id', (req, res) => {
     let id = req.params.id
 
     if(!ObjectID.isValid(id)){
-        return res.status(400).send({
+        return res.status(404).send({
             error: 'ID parameter invalid',
         });
     }
 
     Todo.findById(id).then((todo) => {
-        if (todo.length === 0){
+        if (!todo){
             res.status(404).send({});
         }
 
