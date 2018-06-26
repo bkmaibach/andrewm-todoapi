@@ -4,6 +4,7 @@
   "description": "Lets make a todo app with Andrew Mead on Udemy",
   "main": "index.js",
   "scripts": {
+    "start": "node server/server.js",
     "test": "mocha server/**/*.test.js",
     "test-watch": "nodemon --exec \"npm test\""
   },
