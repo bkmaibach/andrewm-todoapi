@@ -24,7 +24,22 @@ app.post('/todos', (req, res) => {
     })
 });
 
+app.get('/todos', (req, res) => {
+    Todo.find().then((todos) => {
+        res.status(200).send({
+            todos,
+            customCode: 'Look ma!'
+        });
+    }, (err) => {
+        console.log('cannot retrieve docs');
+        res.status(400).send(err);
+    })
+    
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server is up, listening on port ${port}`)
 });
+
+module.exports = {app};

@@ -4,7 +4,8 @@
   "description": "Lets make a todo app with Andrew Mead on Udemy",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha server/**/*.test.js",
+    "test-watch": "nodemon --exec \"npm test\""
   },
   "repository": {
     "type": "git",
@@ -23,5 +24,8 @@
     "mongoose": "^5.1.6"
   },
   "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0",
+    "supertest": "^3.1.0"
   }
 }
