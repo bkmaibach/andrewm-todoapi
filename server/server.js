@@ -8,8 +8,23 @@ const {User} = require('./models/user');
 
 const app = express();
 
+const port = process.env.PORT || 3000;
+
 //define 'middleware' that can be 'used by express'
 app.use(bodyParser.json());
+
+app.get('/', (req, res) => {
+    Todo.find().then(() => {
+        res.status(200).send({
+            message:'andrewm-todoapi is up and running!',
+            port
+        });
+    }, (err) => {
+        console.log('cannot retrieve docs');
+        res.status(400).send(err);
+    })
+    
+});
 
 app.post('/todos', (req, res) => {
     console.log(req.body);
@@ -63,7 +78,6 @@ app.get('/todos/:id', (req, res) => {
     
 });
 
-const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server is up, listening on port ${port}`)
 });

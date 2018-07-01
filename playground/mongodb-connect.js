@@ -2,18 +2,22 @@
 //Object destructureing: pull out a single property of an object using curly braces in the variable name
 //require('mongodb') has a .MongoClient and ObjectId properties, and now they're our variables.
 const {MongoClient, ObjectId} = require('mongodb');
+const {strings} = require('../private/constants.js');
 
 var obj = new ObjectId();
-console.log(obj);
 
-MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, client) => {
+var uri = `mongodb+srv://bkmaibach:${strings.MONGO_PASS}@cluster0-evabu.mongodb.net/admin`;
+console.log(strings.MONGO_PASS);
+console.log(uri);
+
+MongoClient.connect(uri, (err, client) => {
     
 if (err) {
-        return console.log('Unable to connect to MongoDB server');
+        return console.log('Unable to connect to MongoDB server: ', err);
     }
     
     console.log('Connected to MongoDB server...');
-    const db = client.db('TodoApp')
+    const db = client.db('andrewm-todoapi')
 
     db.collection('Todos').insertOne({
         text: 'Buy some bananas',
@@ -32,7 +36,7 @@ if (err) {
     db.collection('Users').insertOne({
         name: 'Butt Donnicker',
         Age: 22,
-        Location: 'Frogballs, Illinois'
+        Location: 'Frogballs, Arkansas'
     }, (err, result) => {
         if (err){
             return console.log('Something went wrong inserting todo: ', err);
