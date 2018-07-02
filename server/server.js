@@ -5,10 +5,11 @@ const {ObjectID} = require('mongodb');
 const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
+const utils = require('./utils');
 
 const app = express();
 
-const port = process.env.PORT || 3000;
+const port = utils.isThisProdEnvironment() ? process.env.PORT : 3000;
 
 //define 'middleware' that can be 'used by express'
 app.use(bodyParser.json());
@@ -17,7 +18,8 @@ app.get('/', (req, res) => {
     Todo.find().then(() => {
         res.status(200).send({
             message:'andrewm-todoapi is up and running!',
-            port
+            port,
+            Production : utils.isThisProdEnvironment()
         });
     }, (err) => {
         console.log('cannot retrieve docs');
@@ -42,6 +44,7 @@ app.post('/todos', (req, res) => {
 
 app.get('/todos', (req, res) => {
     Todo.find().then((todos) => {
+        console.log('Retrieving docs');
         res.status(200).send({
             todos,
             customCode: 'Look ma!'

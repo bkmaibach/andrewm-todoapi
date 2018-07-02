@@ -12,12 +12,12 @@ console.log(uri);
 
 MongoClient.connect(uri, (err, client) => {
     
-if (err) {
-        return console.log('Unable to connect to MongoDB server: ', err);
+    if (err) {
+            return console.log('Unable to connect to MongoDB server: ', err);
     }
-    
+        
     console.log('Connected to MongoDB server...');
-    const db = client.db('andrewm-todoapi')
+    const db = client.db('TodoApp')
 
     db.collection('Todos').insertOne({
         text: 'Buy some bananas',
@@ -32,7 +32,7 @@ if (err) {
 
     // Insert new doc into the users collection, give it a name, age, and location string.
     // Insert it passing in the new collection name and handle any errors.
-    
+
     db.collection('Users').insertOne({
         name: 'Butt Donnicker',
         Age: 22,
