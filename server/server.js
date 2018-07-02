@@ -1,3 +1,6 @@
+const config = require('./config/config.js');
+config.setEnvironmentVariables();
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
@@ -6,11 +9,11 @@ const _ = require('lodash');
 const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
-const utils = require('./utils');
+
 
 const app = express();
 
-const port = utils.isThisProdEnvironment() ? process.env.PORT : 3000;
+const port = process.env.PORT;
 
 //define 'middleware' that can be 'used by express'
 app.use(bodyParser.json());
@@ -20,7 +23,7 @@ app.get('/', (req, res) => {
         res.status(200).send({
             message:'andrewm-todoapi is up and running!',
             port,
-            Production : utils.isThisProdEnvironment()
+            environment: process.env.NODE_ENV
         });
     }, (err) => {
         console.log('cannot retrieve docs');

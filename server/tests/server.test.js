@@ -129,16 +129,86 @@ describe('DELETE /todos/:id', () => {
         });
 
     });
+
     it('should return 404 if todo not found', (done) => {
         request(app)
         .delete(`/todos/${new ObjectID().toHexString()}`)
         .expect(404)
         .end(done);
     });
+
     it('should return 404 if object id is invalid', (done) => {
         request(app)
         .delete(`/todos/whatisthisanidforidiots}`)
         .expect(404)
         .end(done);
     });
+});
+
+describe('PATCH /todos/:id', () => {
+    it('should update the text and completed values', (done) => {
+        //Grab ID of first item
+        let id = testTodos[0]._id.toHexString();
+
+        //Make patch request
+        request(app)
+        .patch(`/todos/${id}`)
+        .send({
+            text:"TEST VALUE",
+            completed: true
+        })
+        .expect(200)
+        .end((err, res) => {
+            if (err) {
+                return done(err);f
+            }
+            //Query database by id, and expect that the item does not exist, using the to not exist assertion
+            Todo.findById(id).then((todo) => {
+                //Update the text and set it to "TEST VALUE"
+                //Set completed to true
+                //Assert 200
+                //Assert that text is changed
+                //Assert that completed is true and that completedAt is a number
+                expect(todo.text).to.equal("TEST VALUE");
+                expect(todo.completed).to.equal(true);
+                expect(todo.completedAt).to.be.a('number');
+                done();
+            }).catch((e) => done(e));
+        });
+
+
+
+    });
+
+    it('should clear completedAt when completed is set to false', (done) => {
+        //Grab the id of the SECOND todo item
+        let id = testTodos[1]._id.toHexString();
+                //Make patch request
+        request(app)
+        .patch(`/todos/${id}`)
+        .send({
+            text:"SOMETHING DIFFERENT",
+            completed: false
+        })
+        .expect(200)
+        .end((err, res) => {
+            if (err) {
+                return done(err);f
+            }
+            //Query database by id, and expect that the item does not exist, using the to not exist assertion
+            Todo.findById(id).then((todo) => {
+                //Update the text to "SOMETHING DIFFERENT"
+                //Update the completed to false
+                //Assert 200
+                //Assert that the text is changed
+                //Assert that completed is false, and that completedAt is null
+                expect(todo.text).to.equal("SOMETHING DIFFERENT");
+                expect(todo.completed).to.equal(false);
+                expect(todo.completedAt).to.be.null;
+                done();
+            }).catch((e) => done(e));
+        });
+
+    });
+
 });
