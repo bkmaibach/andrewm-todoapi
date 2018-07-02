@@ -57,7 +57,7 @@ app.get('/todos', (req, res) => {
 });
 
 app.get('/todos/:id', (req, res) => {
-    let id = req.params.id
+    let id = req.params.id;
 
     if(!ObjectID.isValid(id)){
         return res.status(404).send({
@@ -79,6 +79,41 @@ app.get('/todos/:id', (req, res) => {
         res.status(400).send();
     });
     
+});
+
+app.delete('/todos/:id', (req, res) => {
+    //Get the ID
+    let id = req.params.id;
+
+    //Validate the ID
+    if(!ObjectID.isValid(id)){
+        return res.status(404).send({
+            error: 'ID parameter invalid',
+        });
+    }
+
+    //Remove todo by ID
+    Todo.findByIdAndRemove(id).then((todo) => {
+        console.log(todo);
+        //Success? Check that the doc came back, if no doc send 404
+        if(!todo){
+            res.status(404).send({
+                error: 'Could not find this ID'
+            });
+        } else {
+            res.status(200).send({
+                todo: todo,
+                customCode: 'Look ma!'
+            });
+        }
+    }).catch((e) => {
+        res.status(400).send({error: "An unexpected error was encountered"});
+    });
+
+
+
+    //Error? Send back 400 with empty body
+
 });
 
 app.listen(port, () => {
