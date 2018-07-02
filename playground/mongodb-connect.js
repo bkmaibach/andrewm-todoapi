@@ -6,7 +6,7 @@ const {strings} = require('../private/constants.js');
 
 var obj = new ObjectId();
 
-var uri = `mongodb+srv://bkmaibach:${strings.MONGO_PASS}@cluster0-evabu.mongodb.net/admin`;
+var uri = 'mongodb://localhost:27017/TodoApp';
 console.log(strings.MONGO_PASS);
 console.log(uri);
 
@@ -19,7 +19,7 @@ MongoClient.connect(uri, (err, client) => {
     console.log('Connected to MongoDB server...');
     const db = client.db('TodoApp')
 
-    db.collection('Todos').insertOne({
+    db.collection('todos').insertOne({
         text: 'Buy some bananas',
         completed: false
     }, (err, result) => {
@@ -33,7 +33,7 @@ MongoClient.connect(uri, (err, client) => {
     // Insert new doc into the users collection, give it a name, age, and location string.
     // Insert it passing in the new collection name and handle any errors.
 
-    db.collection('Users').insertOne({
+    db.collection('users').insertOne({
         name: 'Butt Donnicker',
         Age: 22,
         Location: 'Frogballs, Arkansas'
