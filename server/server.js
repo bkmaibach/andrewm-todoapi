@@ -148,11 +148,13 @@ app.post('/users', (req, res) => {
     console.log(req.body);
 
     var user = new User(body);
-    user.save().then((user) => {
+    user.save().then(() => {
+        return user.generateAuthToken();
+    }).then((token) => {
         console.log("the creation of a new user was successfull");
-        res.status(200).send(user);
+        res.header('x-auth', token).status(200).send(user);
     }).catch( (err) => {
-        console.log("user creation failed");
+        console.log("user creation failed: ", err);
         res.status(400).send(err);
     })
 });
