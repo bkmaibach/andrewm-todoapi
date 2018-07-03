@@ -2,21 +2,14 @@ const {expect} = require('chai');
 const request = require('supertest');
 const {ObjectID} = require('mongodb');
 
-const {app} = require('./../server');
-const {Todo} = require('./../models/todo');
-
-const testTodos = [
-    {_id: new ObjectID(), text: 'First todo'},
-    {_id: new ObjectID(), text: 'Second todo'},
-    {_id: new ObjectID(), text: 'Third todo'}
-];
+const {app} = require('./../server.js');
+const {Todo} = require('./../models/todo.js');
+const {User} = require('./../models/user.js');
+const {testTodos, testUsers, populateTodos, populateUsers} = require('./seed/seed.js');
 
 //Clear out the database since later in the test we assume that the database is empty
-beforeEach((done) => {
-    Todo.remove({}).then(() => {
-        Todo.insertMany(testTodos);
-    }).then(() => done());
-});
+beforeEach(populateTodos);
+beforeEach(populateUsers);
 
 describe('POST /todos', () => {
     it('should create a new todo', (done) => {
@@ -63,7 +56,7 @@ describe('POST /todos', () => {
                 return done(err);
             }
             Todo.find().then((todos) => {
-                expect(todos.length).to.equal(3);
+                expect(todos.length).to.equal(2);
                 done();
             }).catch((e) => done(e));
         });
@@ -76,7 +69,7 @@ describe('GET /todos', () => {
         .get('/todos')
         .expect(200)
         .expect((res) => {
-            expect(res.body.todos.length).to.equal(3);
+            expect(res.body.todos.length).to.equal(2);
         }).end(done);
     });
 })
@@ -100,7 +93,7 @@ describe('GET /todos/:id', () => {
 
     it('should return 404 for non-object ids', (done) => {
         request(app)
-        .get(`/todos/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}`)
+        .get(`/todos/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}`)
         .expect(404)
         .end(done);
     });
@@ -121,7 +114,7 @@ describe('DELETE /todos/:id', () => {
             if (err) {
                 return done(err);f
             }
-            //Query database by id, and expect that the item does not exist, using the to not exist assertion
+            //Query database by id, and expect that the item does not exist, using the to be null expectation
             Todo.findById(hexId).then((todo) => {
                 expect(todo).to.be.null;
                 done();
@@ -208,7 +201,119 @@ describe('PATCH /todos/:id', () => {
                 done();
             }).catch((e) => done(e));
         });
+    });
+});
 
+describe('GET /users/me', () => {
+    it('should return an authenticated user', (done) => {
+        request(app)
+        .get('/users/me')
+        .set('x-auth', testUsers[0].tokens[0].token)
+        .expect(200)
+        .expect((res) => {
+            expect(res.body._id).to.equal(testUsers[0]._id.toHexString());
+            expect(res.body.email).to.equal(testUsers[0].email);
+        })
+        .end(done);
+    });
+
+    it('should return 401 and nothing else on an unauthenticated user', (done) => {
+        request(app)
+        .get('/users/me')
+        .expect(401)
+        .expect((res) => {
+            expect(res.body).to.be.empty;
+        })
+        .end(done);
+    });
+
+});
+
+describe('POST /users', () => {
+    it('should create a user', (done) => {
+        var email = 'something@email.com';
+        var password = 'asdfasdf';
+
+        request(app)
+            .post('/users')
+            .send({email, password})
+            .expect(200)
+            .expect((res) => {
+                expect(res.headers['x-auth']).to.exist;
+                expect(res.body.email).to.equal(email);
+            })
+            .end((err, res) => {
+                if (err) {
+                    return done(err);f
+                }
+                //Query database by id, and expect that the item does not exist, using the to be null expectation
+                User.findByToken(res.header['x-auth']).then((user) => {
+                    expect(user.email).to.equal(email);
+                    expect(user.password).to.not.equal(password);
+                    done();
+                }).catch((e) => done(e));
+            });
+    });
+
+    it('should return validation errors if email invalid', (done) => {
+        var badEmail = 'bad@email'
+        var password = 'asdfasdf'
+        request(app)
+            .post('/users')
+            .send({badEmail, password})
+            .expect(400)
+            .expect((res) => {
+                expect(res.body.email).to.not.exist;
+            })
+            .end((err, res) => {
+                if (err) {
+                    return done(err);f
+                }
+                User.findOne({badEmail}).then((user) => {
+                    expect(user).to.not.exist;
+                    done();
+                }).catch((e) => done(e));
+            });
+    });
+
+    it('should return validation errors if password invalid', (done) => {
+        var email = 'good@email.com';
+        var badPass = 'a';
+        request(app)
+            .post('/users')
+            .send({email, password: badPass})
+            .expect(400)
+            .expect((res) => {
+                expect(res.body.email).to.not.exist;
+            })
+            .end((err, res) => {
+                if (err) {
+                    return done(err);f
+                }
+                User.findOne({email}).then((user) => {
+                    expect(user).to.not.exist;
+                    done();
+                }).catch((e) => done(e));
+            });
+    });
+
+    it('should not create a user if email is in use', (done) => {
+        var email = testUsers[0].email;
+        var password = testUsers[0].password;
+        request(app)
+        .post('/users')
+        .send({email, password})
+        .expect(400)
+        .expect(res.body.email).to.not.exist
+        .end((err, res) => {
+            if (err) {
+                return done(err);f
+            }
+            User.find({email}).then((users) => {
+                expect(users.length).to.equal(1);
+                done();
+            }).catch((e) => done(e));
+        });
     });
 
 });

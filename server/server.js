@@ -36,7 +36,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/todos', (req, res) => {
-    console.log(req.body);
+    //console.log(req.body);
     var todo = new Todo({
         text: req.body.text
     });
@@ -51,7 +51,6 @@ app.post('/todos', (req, res) => {
 
 app.get('/todos', (req, res) => {
     Todo.find().then((todos) => {
-        console.log('Retrieving docs');
         res.status(200).send({
             todos,
             customMessage: 'Check it out, guys! -BKM'
@@ -101,7 +100,7 @@ app.delete('/todos/:id', (req, res) => {
 
     //Remove todo by ID
     Todo.findByIdAndRemove(id).then((todo) => {
-        console.log(todo);
+        //console.log(todo);
         //Success? Check that the doc came back, if no doc send 404
         if(!todo){
             res.status(404).send({
@@ -146,7 +145,7 @@ app.patch('/todos/:id', (req, res) => {
 
 app.post('/users', (req, res) => {
     let body = _.pick(req.body, ['email', 'password']);
-    console.log(req.body);
+    console.debug(req.body);
 
     var user = new User(body);
     user.save().then(() => {
