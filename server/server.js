@@ -21,9 +21,11 @@ app.use(bodyParser.json());
 app.get('/', (req, res) => {
     Todo.find().then(() => {
         res.status(200).send({
-            message:'andrewm-todoapi is up and running!',
+            status:'andrewm-todoapi is up and running!',
             port,
-            environment: process.env.NODE_ENV
+            environment: process.env.NODE_ENV,
+            currentTodos: 'http://todo.maibach.ca/todos',
+            customMessage: 'Check it out, guys! -BKM'
         });
     }, (err) => {
         console.log('cannot retrieve docs');
@@ -51,7 +53,7 @@ app.get('/todos', (req, res) => {
         console.log('Retrieving docs');
         res.status(200).send({
             todos,
-            customCode: 'Look ma!'
+            customMessage: 'Check it out, guys! -BKM'
         });
     }, (err) => {
         console.log('cannot retrieve docs');
@@ -76,7 +78,7 @@ app.get('/todos/:id', (req, res) => {
 
         res.status(200).send({
             todo: todo,
-            customCode: 'Look ma!'
+            customMessage: 'Check it out, guys! -BKM'
         });
         
     }).catch((e) => {
@@ -107,7 +109,7 @@ app.delete('/todos/:id', (req, res) => {
         } else {
             res.status(200).send({
                 todo: todo,
-                customCode: 'Look ma!'
+                customMessage: 'Check it out, guys! -BKM'
             });
         }
     }).catch((e) => {
