@@ -32,6 +32,7 @@ var UserSchema = new mongoose.Schema({
     }],
 });
 
+//Override this function so that sensitive uneccessary/sensitive data is not transferred back
 UserSchema.methods.toJSON = function() {
     var user = this;
     var userObject = user.toObject();
@@ -50,6 +51,27 @@ UserSchema.methods.generateAuthToken = function () {
         //chained onto this again. However, this is perfectly legal. The return value is used
         //in the success argument of the next return call.
         return token;
+    });
+};
+
+UserSchema.statics.findByToken = function (token) {
+    let User = this;
+    var decoded;
+
+    try{
+        decoded = jwt.verify(token, strings.salt);
+    } catch (e) {
+        // return new Promise((resolve, reject) => {
+        //     reject();
+        // });
+        //Does the same thing as:
+        return Promise.reject();
+    }
+
+    return User.findOne({
+        '_id': decoded._id,
+        'tokens.token': token,
+        'tokens.access': 'auth'
     });
 };
 
