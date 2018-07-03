@@ -1,5 +1,7 @@
+const {strings} = require('../../private/constants.js');
+
 const setEnvironmentVariables = function () {
-    if(process.env.NODE_ENV === null){
+    if(process.env.NODE_ENV == undefined){
         process.env.NODE_ENV = 'development';
         process.env.PORT = 3000;
         process.env.MONGODB_URI = 'mongodb://localhost:27017/TodoApp';
