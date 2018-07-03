@@ -40,10 +40,10 @@ app.post('/todos', (req, res) => {
         text: req.body.text
     });
     todo.save().then((doc) => {
-        console.log("the creation of a new doc was successfull");
+        console.log("the creation of a new todo was successfull");
         res.status(200).send(doc);
     }, (err) => {
-        console.log("doc creation failed");
+        console.log("todo creation failed");
         res.status(400).send(err);
     })
 });
@@ -136,10 +136,24 @@ app.patch('/todos/:id', (req, res) => {
         if (!todo) {
             res.status(404).send();
         } else {
-            res.send({todo})
+            res.send({todo});
         }
     }).catch((error) => {
         res.status(400).send();
+    })
+});
+
+app.post('/users', (req, res) => {
+    let body = _.pick(req.body, ['email', 'password']);
+    console.log(req.body);
+
+    var user = new User(body);
+    user.save().then((user) => {
+        console.log("the creation of a new user was successfull");
+        res.status(200).send(user);
+    }).catch( (err) => {
+        console.log("user creation failed");
+        res.status(400).send(err);
     })
 });
 
