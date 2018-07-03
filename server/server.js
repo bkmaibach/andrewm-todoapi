@@ -41,10 +41,10 @@ app.post('/todos', (req, res) => {
         text: req.body.text
     });
     todo.save().then((doc) => {
-        console.log("the creation of a new todo was successfull");
+        //console.log("the creation of a new todo was successfull");
         res.status(200).send(doc);
     }, (err) => {
-        console.log("todo creation failed");
+        //console.log("todo creation failed");
         res.status(400).send(err);
     })
 });
@@ -149,10 +149,10 @@ app.post('/users', (req, res) => {
     user.save().then(() => {
         return user.generateAuthToken();
     }).then((token) => {
-        console.log("the creation of a new user was successfull");
+        //console.log("the creation of a new user was successfull");
         res.header('x-auth', token).status(200).send(user);
     }).catch( (err) => {
-        console.log("user creation failed: ", err);
+        //console.log("user creation failed");
         res.status(400).send(err);
     })
 });

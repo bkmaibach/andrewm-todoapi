@@ -226,14 +226,12 @@ describe('GET /users/me', () => {
         })
         .end(done);
     });
-
 });
 
 describe('POST /users', () => {
     it('should create a user', (done) => {
         var email = 'something@email.com';
         var password = 'asdfasdf';
-
         request(app)
             .post('/users')
             .send({email, password})
@@ -256,11 +254,11 @@ describe('POST /users', () => {
     });
 
     it('should return validation errors if email invalid', (done) => {
-        var badEmail = 'bad@email'
+        var email = 'bad@email'
         var password = 'asdfasdf'
         request(app)
             .post('/users')
-            .send({badEmail, password})
+            .send({email, password})
             .expect(400)
             .expect((res) => {
                 expect(res.body.email).to.not.exist;
@@ -269,7 +267,7 @@ describe('POST /users', () => {
                 if (err) {
                     return done(err);f
                 }
-                User.findOne({badEmail}).then((user) => {
+                User.findOne({email}).then((user) => {
                     expect(user).to.not.exist;
                     done();
                 }).catch((e) => done(e));
@@ -278,10 +276,10 @@ describe('POST /users', () => {
 
     it('should return validation errors if password invalid', (done) => {
         var email = 'good@email.com';
-        var badPass = 'a';
+        var password = 'a';
         request(app)
             .post('/users')
-            .send({email, password: badPass})
+            .send({email, password})
             .expect(400)
             .expect((res) => {
                 expect(res.body.email).to.not.exist;
@@ -304,7 +302,9 @@ describe('POST /users', () => {
         .post('/users')
         .send({email, password})
         .expect(400)
-        .expect(res.body.email).to.not.exist
+        .expect((res) => {
+            expect(res.body.email).to.not.exist;
+        })
         .end((err, res) => {
             if (err) {
                 return done(err);f
@@ -314,6 +314,48 @@ describe('POST /users', () => {
                 done();
             }).catch((e) => done(e));
         });
+    });
+});
+
+describe('POST /users/login', () => {
+    var email = testUsers[1].email;
+    var password = testUsers[1].password;
+    it('should login user with correct email and password and return auth token', (done) => {
+        request(app)
+        .post('/users/login')
+        .send({email, password})
+        .expect(200)
+        .expect((res) => {
+            expect(res.body._id).to.equal(testUsers[1]._id.toHexString());
+            expect(res.body.email).to.equal(testUsers[1].email);
+            expect(res.headers['x-auth']).to.exist;
+        })
+        .end((err, res) => {
+            if (err) {
+                return done(err);
+            }
+            User.findById(testUsers[1]._id).then((user) => {
+                expect(user.tokens[0]).to.include({
+                    access: 'auth',
+                    token: res.headers['x-auth']
+                });
+                done();
+            }).catch((e) => done(e));
+        });
+        
+    });
+
+    it('should reject invalid login', (done) => {
+        var email = testUsers[0].email;
+        var password = 'LEETHAX??';
+        request(app)
+        .post('/users/login')
+        .send({email, password})
+        .expect(400)
+        .expect((res) => {
+            expect(res.body).to.be.empty;
+        })
+        .end(done);
     });
 
 });
