@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
-const {strings} = require('../../private/constants.js');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 
@@ -44,7 +43,7 @@ UserSchema.methods.toJSON = function() {
 UserSchema.methods.generateAuthToken = function () {
     var user = this;
     var access = 'auth';
-    var token = jwt.sign({_id: user._id.toHexString(), access}, strings.salt).toString();
+    var token = jwt.sign({_id: user._id.toHexString(), access}, process.env.JWT_SECRET).toString();
 
     user.tokens = user.tokens.concat([{access, token}]);
     return user.save().then(() => {
@@ -102,7 +101,7 @@ UserSchema.statics.findByToken = function (token) {
     var decoded;
 
     try{
-        decoded = jwt.verify(token, strings.salt);
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (e) {
         // return new Promise((resolve, reject) => {
         //     reject();

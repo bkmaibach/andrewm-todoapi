@@ -30,3 +30,4 @@ node_modules/
 private/
 deployments/
 *.zip
+server/config/config.json

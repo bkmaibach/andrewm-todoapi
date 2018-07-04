@@ -1,5 +1,4 @@
 const config = require('./config/config.js');
-config.setEnvironmentVariables();
 
 const express = require('express');
 const bodyParser = require('body-parser');
