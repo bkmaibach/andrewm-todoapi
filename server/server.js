@@ -16,6 +16,8 @@ const app = express();
 
 const port = process.env.PORT;
 
+const customMessage = 'Check out the source code at https://github.com/bkmaibach/andrewm-todoapi'
+
 //define 'middleware' that can be 'used by express'
 app.use(bodyParser.json());
 
@@ -26,7 +28,7 @@ app.get('/', (req, res) => {
             port,
             environment: process.env.NODE_ENV,
             currentTodos: 'http://todo.maibach.ca/todos',
-            customMessage: 'Check it out, guys! -BKM'
+            customMessage
         });
     }, (err) => {
         console.log('cannot retrieve docs');
@@ -53,7 +55,7 @@ app.get('/todos', (req, res) => {
     Todo.find().then((todos) => {
         res.status(200).send({
             todos,
-            customMessage: 'Check it out, guys! -BKM'
+            customMessage
         });
     }, (err) => {
         console.log('cannot retrieve docs');
@@ -78,7 +80,7 @@ app.get('/todos/:id', (req, res) => {
 
         res.status(200).send({
             todo: todo,
-            customMessage: 'Check it out, guys! -BKM'
+            customMessage
         });
         
     }).catch((e) => {
@@ -109,7 +111,7 @@ app.delete('/todos/:id', (req, res) => {
         } else {
             res.status(200).send({
                 todo: todo,
-                customMessage: 'Check it out, guys! -BKM'
+                customMessage
             });
         }
     }).catch((e) => {
@@ -157,8 +159,19 @@ app.post('/users', (req, res) => {
     })
 });
 
+//To require authentication, all that needs to be done is provide authenticate as an argument here:
 app.get('/users/me', authenticate, (req, res) => {
     res.send(req.user);
+});
+
+//The authenticate middleware provides us with access to the token (obtained from a header) as well as a 
+//particular user object, because it was added as a prooeprty to the req object
+app.delete('/users/me/token', authenticate, (req, res) => {
+    req.user.removeToken(req.token).then(() => {
+        res.status(200).send();
+    }, () => {
+        res.status(400).send();
+    });
 });
 
 app.post('/users/login', (req, res) => {
@@ -166,7 +179,6 @@ app.post('/users/login', (req, res) => {
         return user.generateAuthToken().then((token) => {
             res.header('x-auth', token).status(200).send(user);
         });
-        res.send(user);
     }).catch((e) => {
         res.status(400).send();
     });

@@ -55,6 +55,24 @@ UserSchema.methods.generateAuthToken = function () {
     });
 };
 
+UserSchema.methods.removeToken = function (token) {
+    var user = this;
+    //Let it be known that a return statement must be made here!!
+    return user.update({
+        $pull: {
+            //specify the entity you want to "pull" from
+            tokens: {
+                //pull from the tokens array any property
+                //If token matches something in that array, the entire obejct containing that property will
+                //get removed, one less item in the array
+                //token: token
+                token
+            }
+        }
+    });
+
+};
+
 UserSchema.statics.findByCredentials = function (email, password) {
     var User = this;
     return User.findOne({email}).then((user) => {
@@ -100,8 +118,7 @@ UserSchema.statics.findByToken = function (token) {
     });
 };
 
-//Add Mongoose middleware to make things happen before or after any action
-
+//Add Mongoose middleware to make things happen before or after any action, in this case save
 UserSchema.pre('save', function (next) {
     var user = this;
 
