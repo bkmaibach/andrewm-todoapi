@@ -27,7 +27,6 @@ app.get('/', (req, res) => {
             status:'andrewm-todoapi is up and running!',
             port,
             environment: process.env.NODE_ENV,
-            currentTodos: 'http://todo.maibach.ca/todos',
             customMessage
         });
     }, (err) => {
@@ -37,10 +36,11 @@ app.get('/', (req, res) => {
     
 });
 
-app.post('/todos', (req, res) => {
+app.post('/todos', authenticate, (req, res) => {
     //console.log(req.body);
     var todo = new Todo({
-        text: req.body.text
+        text: req.body.text,
+        _creator: req.user._id
     });
     todo.save().then((doc) => {
         //console.log("the creation of a new todo was successfull");
@@ -51,8 +51,8 @@ app.post('/todos', (req, res) => {
     })
 });
 
-app.get('/todos', (req, res) => {
-    Todo.find().then((todos) => {
+app.get('/todos', authenticate, (req, res) => {
+    Todo.find({_creator: req.user._id}).then((todos) => {
         res.status(200).send({
             todos,
             customMessage
@@ -64,7 +64,7 @@ app.get('/todos', (req, res) => {
     
 });
 
-app.get('/todos/:id', (req, res) => {
+app.get('/todos/:id', authenticate, (req, res) => {
     let id = req.params.id;
 
     if(!ObjectID.isValid(id)){
@@ -73,7 +73,10 @@ app.get('/todos/:id', (req, res) => {
         });
     }
 
-    Todo.findById(id).then((todo) => {
+    Todo.findOne({
+        _id: id,
+        _creator: req.user._id
+    }).then((todo) => {
         if (!todo){
             res.status(404).send({});
         }
@@ -89,7 +92,7 @@ app.get('/todos/:id', (req, res) => {
     
 });
 
-app.delete('/todos/:id', (req, res) => {
+app.delete('/todos/:id', authenticate, (req, res) => {
     //Get the ID
     let id = req.params.id;
 
@@ -101,7 +104,10 @@ app.delete('/todos/:id', (req, res) => {
     }
 
     //Remove todo by ID
-    Todo.findByIdAndRemove(id).then((todo) => {
+    Todo.findOneAndRemove({
+        _id: id,
+        _creator: req.user._id
+    }).then((todo) => {
         //console.log(todo);
         //Success? Check that the doc came back, if no doc send 404
         if(!todo){
@@ -119,7 +125,7 @@ app.delete('/todos/:id', (req, res) => {
     });
 });
 
-app.patch('/todos/:id', (req, res) => {
+app.patch('/todos/:id', authenticate, (req, res) => {
     let id = req.params.id;
     let body = _.pick(req.body, ['text', 'completed']);
     if(!ObjectID.isValid(id)){
@@ -134,7 +140,10 @@ app.patch('/todos/:id', (req, res) => {
         body.completedAt = null;
     }
 
-    Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+    Todo.findOneAndUpdate({
+        _id: id,
+        _creator: req.user._id
+    }, {$set: body}, {new: true}).then((todo) => {
         if (!todo) {
             res.status(404).send();
         } else {

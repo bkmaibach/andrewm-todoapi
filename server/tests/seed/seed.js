@@ -10,7 +10,7 @@ const userOneId = new ObjectID();
 
 const testUsers = [{
     _id: userZeroId,
-    email: 'test@example.com',
+    email: 'user@zero.com',
     password: 'User0TestPass',
     tokens: [{
         access: 'auth',
@@ -18,18 +18,29 @@ const testUsers = [{
     }]
 }, {
     _id: userOneId,
-    email: 'trial@sample.com',
+    email: 'user@one.com',
     password: 'User1TestPass',
+    tokens: [{
+        access: 'auth',
+        token: jwt.sign({_id: userOneId, access: 'auth'}, strings.salt).toString()
+    }]
 }];
 
 const testTodos = [{
     _id: new ObjectID(),
-    text: 'First todo'
+    text: 'First todo',
+    _creator: userZeroId,
+    //note that any default values cant be assumed for testTodos
+    //because this array has not touched been touched by mongoose yet
+    //when it is being access directly from within the test suit
+    completed: false,
+    completedAt: null
 }, {
     _id: new ObjectID(),
     text: 'Second todo',
     completed: true,
-    completedAt: 333
+    completedAt: 333,
+    _creator: userOneId
 }];
 
 const populateTodos = (done) => {

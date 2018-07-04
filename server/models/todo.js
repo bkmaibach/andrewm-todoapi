@@ -9,11 +9,16 @@ var Todo = mongoose.model('Todo', {
     },
     completed:{
         type: Boolean,
-        default: false
+        default: false,
+        setDefaultsOnInsert: true
     },
     completedAt:{
         type: Number,
         default: null
+    },
+    _creator:{
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
     }
 });
 
