@@ -353,9 +353,38 @@ describe('POST /users/login', () => {
         .send({email, password})
         .expect(400)
         .expect((res) => {
+            //May need to be changed
             expect(res.body).to.be.empty;
         })
         .end(done);
     });
+
+});
+
+describe('DELETE /users/me/token', () => {
+    var token = testUsers[0].tokens[0].token;
+    it('should remove an existing token', (done) => {
+        request(app)
+        .delete('/users/me/token')
+        .set('x-auth', token)
+        .send()
+        .expect(200)
+        .expect((res) => {
+            //May need to be changed
+            expect(res.body).to.be.empty;
+        })
+        .end((err, res) => {
+            if (err) {
+                return done(err);
+            }
+            User.findById(testUsers[0]._id).then((user) => {
+                expect(user.tokens).to.be.empty;
+                done();
+            }).catch((e) => done(e));
+        });
+        
+    });
+
+
 
 });
